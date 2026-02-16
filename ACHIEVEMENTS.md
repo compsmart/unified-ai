@@ -459,4 +459,59 @@ For more complex training:
 
 ---
 
+## Sequence Prediction Analysis (Feb 2026)
+
+### Test Results
+
+| Test Case | Result | Notes |
+|-----------|--------|-------|
+| **Single sequence** | ✓ Working | Isolated lattice performs well |
+| **Non-overlapping sequences** | ✓ Working | Separate neuron ranges work |
+| **Overlapping sequences** | ⚠ Partial | Interference when concepts shared |
+| **Agent - single** | ✓ Working | Full stack works |
+| **Agent - multiple** | 67% | 2/3 correct predictions |
+
+### Core Intelligence Independence
+
+The conversational AI achieves **100% intelligence score** without relying on sequence prediction:
+
+- ✓ Fact storage/retrieval (HippocampusVSA)
+- ✓ Transitive reasoning (Reasoner)
+- ✓ Context tracking (Agent)
+- ✓ Honesty (Agent)
+
+### Scalability Issues Identified
+
+1. **Weight Interference** - Multiple sequences sharing neurons create conflicting causal links
+2. **Hebbian Saturation** - Weight normalization dilutes connections as sequences added
+3. **Phase Desynchronization** - Random oscillator frequencies cause drift
+4. **Concept Overlap** - P(overlap) ≈ 53% with K=10 neurons, L=256 lattice, N=20 concepts
+
+### Recommendations
+
+| Option | Effort | Benefit |
+|--------|--------|---------|
+| **Keep for limited use** | None | Works for simple patterns |
+| **Hippocampus sequences** | Low | Store as facts: "after_X" → "Y" |
+| **Dedicated neuron ranges** | Medium | Prevent interference |
+| **Larger lattice (1024+)** | Low | Reduce overlap probability |
+| **LSTM/Transformer** | High | Industrial-strength sequences |
+
+### Verdict
+
+**The coupled oscillator approach is feasible for:**
+- Single sequences or few non-overlapping sequences
+- Simple patterns (daily routines, workflows)
+- Demo/prototype purposes
+
+**Not recommended for:**
+- Complex multi-sequence learning
+- Large-scale pattern libraries
+- Production systems requiring >90% accuracy
+
+*See `test_sequence_analysis.py` for detailed analysis.*
+
+---
+
 *Generated: 2026-02-16*
+*Updated: 2026-02-16 (sequence analysis)*

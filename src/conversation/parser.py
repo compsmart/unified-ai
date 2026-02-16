@@ -65,8 +65,14 @@ class Parser:
             (r"what is (\w+)\??$", self._extract_what_is),
             # What is the X? (e.g., "What is the code?")
             (r"what is the (\w+)\??$", self._extract_what_the),
+            # How old is X?
+            (r"how old is (\w+)\??", self._extract_how_old),
+            # What does X have?
+            (r"what does (\w+) have\??", self._extract_what_has),
             # Where is/does X?
             (r"where (?:is|does) (\w+)(?: work| live| stay)?\??", self._extract_where),
+            # When is X? (time query)
+            (r"when is (?:the )?(\w+)\??", self._extract_when),
             # Who is X?
             (r"who is (\w+)\??", self._extract_who),
             # Does X have/know Y?
@@ -84,16 +90,20 @@ class Parser:
         # Statement patterns (facts to learn)
         # IMPORTANT: More specific patterns must come FIRST
         self.statement_patterns = [
+            # X is N years old (age)
+            (r"(\w+) is (\d+) years? old", self._extract_age),
             # His/Her X is Y (context-dependent)
             (r"(?:his|her|their) (\w+) is (\w+)", self._extract_context_statement),
+            # He/She lives in Y (context-dependent)
+            (r"(?:he|she|they) lives? (?:in|at) (\w+)", self._extract_context_lives),
             # My X is Y (e.g., "My name is John")
             (r"my (\w+) is (\w+)", self._extract_my_statement),
             # Remember: X is Y
             (r"remember:? (\w+) is (\w+)", self._extract_remember_fact),
-            # Note: X is Y
+            # Note: X is/at Y
             (r"note:? (\w+) (?:is|at) (\w+)", self._extract_note_fact),
             # Important: X is Y
-            (r"important:? (\w+) is (\w+)", self._extract_note_fact),
+            (r"important:? (\w+) (?:is|under|at) (\w+)", self._extract_note_location),
             # X's Y is Z (most specific, must be first)
             (r"(\w+)'s (\w+) is (\w+)", self._extract_possessive),
             # The Y of X is Z
@@ -105,11 +115,13 @@ class Parser:
             # X lives in Y
             (r"(\w+) lives (?:in|at) (\w+)", self._extract_lives_in),
             # X has Y
-            (r"(\w+) has (?:a |an )?(\w+)", self._extract_has),
+            (r"(\w+) has (?:a |an )?(.+)", self._extract_has),
             # X knows Y
             (r"(\w+) knows (?:about )?(\w+)", self._extract_knows),
             # Remember that X
             (r"remember (?:that )?(.+)", self._extract_remember),
+            # X is under/on/near Y (location)
+            (r"(\w+) is (?:under|on|near|behind|beside) (?:the )?(\w+)", self._extract_is_under),
             # X is in/at Y (location)
             (r"(\w+) is (?:in|at) (\w+)", self._extract_is_location),
             # X is Y / X is a Y (least specific, must be last)
@@ -376,6 +388,43 @@ class Parser:
         return {
             "context_entity": match.group(1)
         }
+
+    def _extract_age(self, match) -> Dict:
+        return {
+            "entity": match.group(1),
+            "role": "age",
+            "value": match.group(2)
+        }
+
+    def _extract_context_lives(self, match) -> Dict:
+        return {
+            "entity": "_context_",
+            "role": "location",
+            "value": match.group(1)
+        }
+
+    def _extract_note_location(self, match) -> Dict:
+        return {
+            "entity": match.group(1),
+            "role": "location",
+            "value": match.group(2)
+        }
+
+    def _extract_is_under(self, match) -> Dict:
+        return {
+            "entity": match.group(1),
+            "role": "location",
+            "value": match.group(2)
+        }
+
+    def _extract_how_old(self, match) -> Dict:
+        return {"entity": match.group(1), "role": "age"}
+
+    def _extract_what_has(self, match) -> Dict:
+        return {"entity": match.group(1), "role": "has"}
+
+    def _extract_when(self, match) -> Dict:
+        return {"entity": match.group(1), "role": "time"}
 
     # Extractors for teaching
     def _extract_source(self, match) -> Dict:

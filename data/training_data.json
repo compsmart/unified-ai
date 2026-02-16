@@ -1,0 +1,89 @@
+{
+  "facts": [
+    {"entity": "Paris", "role": "type", "value": "city"},
+    {"entity": "France", "role": "capital", "value": "Paris"},
+    {"entity": "France", "role": "type", "value": "country"},
+    {"entity": "France", "role": "continent", "value": "Europe"},
+
+    {"entity": "London", "role": "type", "value": "city"},
+    {"entity": "UK", "role": "capital", "value": "London"},
+    {"entity": "UK", "role": "type", "value": "country"},
+    {"entity": "UK", "role": "continent", "value": "Europe"},
+
+    {"entity": "Berlin", "role": "type", "value": "city"},
+    {"entity": "Germany", "role": "capital", "value": "Berlin"},
+    {"entity": "Germany", "role": "type", "value": "country"},
+
+    {"entity": "Tokyo", "role": "type", "value": "city"},
+    {"entity": "Japan", "role": "capital", "value": "Tokyo"},
+    {"entity": "Japan", "role": "type", "value": "country"},
+    {"entity": "Japan", "role": "continent", "value": "Asia"},
+
+    {"entity": "Engineer", "role": "type", "value": "profession"},
+    {"entity": "Engineer", "role": "requires", "value": "degree"},
+    {"entity": "Doctor", "role": "type", "value": "profession"},
+    {"entity": "Doctor", "role": "requires", "value": "medical_degree"},
+    {"entity": "Teacher", "role": "type", "value": "profession"},
+
+    {"entity": "Python", "role": "type", "value": "programming_language"},
+    {"entity": "JavaScript", "role": "type", "value": "programming_language"},
+    {"entity": "programming_language", "role": "used_for", "value": "software"},
+
+    {"entity": "dog", "role": "type", "value": "animal"},
+    {"entity": "dog", "role": "has", "value": "legs"},
+    {"entity": "cat", "role": "type", "value": "animal"},
+    {"entity": "animal", "role": "is", "value": "living"}
+  ],
+
+  "sequences": [
+    ["Morning", "Breakfast", "Work", "Lunch", "Work", "Dinner", "Sleep"],
+    ["Wake", "Shower", "Dress", "Leave"],
+    ["Request", "Process", "Validate", "Approve", "Complete"],
+    ["Start", "Initialize", "Run", "Finish", "Cleanup"],
+    ["Connect", "Authenticate", "Query", "Response", "Disconnect"]
+  ],
+
+  "test_queries": [
+    {"input": "What is Paris?", "expected_contains": "city"},
+    {"input": "What is the capital of France?", "expected_entity": "Paris"},
+    {"input": "What type is Engineer?", "expected_contains": "profession"},
+    {"input": "What does Engineer require?", "expected_contains": "degree"}
+  ],
+
+  "reasoning_tests": [
+    {
+      "setup": [
+        {"entity": "Alice", "role": "job", "value": "Engineer"},
+        {"entity": "Engineer", "role": "requires", "value": "degree"}
+      ],
+      "query": {"entity": "Alice", "role": "requires"},
+      "expected": "degree",
+      "description": "Transitive: Alice -> Engineer -> requires degree"
+    },
+    {
+      "setup": [
+        {"entity": "Bob", "role": "workplace", "value": "Google"},
+        {"entity": "Google", "role": "location", "value": "California"}
+      ],
+      "query": {"entity": "Bob", "role": "location"},
+      "expected": "California",
+      "description": "Transitive: Bob -> Google -> California"
+    }
+  ],
+
+  "conversation_tests": [
+    {
+      "dialogue": [
+        {"user": "My name is Test", "expect_learned": true},
+        {"user": "What is my name?", "expect_contains": "test"}
+      ]
+    },
+    {
+      "dialogue": [
+        {"user": "Apple is a company", "expect_learned": true},
+        {"user": "Apple's location is Cupertino", "expect_learned": true},
+        {"user": "Where is Apple?", "expect_contains": "cupertino"}
+      ]
+    }
+  ]
+}

@@ -11,6 +11,7 @@ This folder documents key problems encountered during development, the solutions
 | [03-weight-saturation](03-weight-saturation.md) | Diagnosed | Coupled oscillators |
 | [04-case-sensitivity](04-case-sensitivity.md) | Solved | NLP parsing |
 | [05-transitive-reasoning](05-transitive-reasoning.md) | Solved | Inference chains |
+| [06-hybrid-architecture](06-hybrid-architecture.md) | **Solved** | 80%+ accuracy achieved |
 
 ## Architecture Overview
 

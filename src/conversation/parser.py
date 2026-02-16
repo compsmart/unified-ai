@@ -69,8 +69,8 @@ class Parser:
             (r"how old is (\w+)\??", self._extract_how_old),
             # What does X have?
             (r"what does (\w+) have\??", self._extract_what_has),
-            # Where is/does X?
-            (r"where (?:is|does) (\w+)(?: work| live| stay)?\??", self._extract_where),
+            # Where is/does X? (handle "the X")
+            (r"where (?:is|does) (?:the )?(\w+)(?: work| live| stay)?\??", self._extract_where),
             # When is X? (time query)
             (r"when is (?:the )?(\w+)\??", self._extract_when),
             # Who is X?
@@ -102,8 +102,8 @@ class Parser:
             (r"remember:? (\w+) is (\w+)", self._extract_remember_fact),
             # Note: X is/at Y (support alphanumeric)
             (r"note:? (\w+) (?:is|at) (\S+)", self._extract_note_fact),
-            # Important: X is Y (support alphanumeric and location)
-            (r"important:? (\w+) (?:is|under|at) (\S+)", self._extract_note_location),
+            # Important: X is under/at Y (capture full location)
+            (r"important:? (\w+) is (?:under|on|near|at) (?:the )?(\w+)", self._extract_note_location),
             # X's Y is Z (most specific, must be first)
             (r"(\w+)'s (\w+) is (\w+)", self._extract_possessive),
             # The Y of X is Z
@@ -355,10 +355,18 @@ class Parser:
         }
 
     def _extract_note_fact(self, match) -> Dict:
+        entity = match.group(1)
+        value = match.group(2)
+        # Infer role from pattern
+        text = match.group(0).lower()
+        if ' at ' in text:
+            role = 'time'
+        else:
+            role = 'value'
         return {
-            "entity": match.group(1),
-            "role": "value",
-            "value": match.group(2)
+            "entity": entity,
+            "role": role,
+            "value": value
         }
 
     def _extract_the_is(self, match) -> Dict:
@@ -369,6 +377,9 @@ class Parser:
         color_words = ['blue', 'red', 'green', 'yellow', 'black', 'white', 'orange', 'purple', 'pink', 'brown', 'gray', 'grey']
         if value.lower() in color_words:
             role = 'color'
+        elif any(c.isdigit() for c in value):
+            # Contains digits, likely a value/code
+            role = 'value'
         else:
             role = 'type'
         return {

@@ -80,7 +80,7 @@ class Parser:
             # Is X a Y? (require "a" or "an")
             (r"is (\w+) (?:a|an) (\w+)\??", self._extract_is_a),
             # Tell me about X
-            (r"(?:tell me about|describe|explain) (\w+)", self._extract_about),
+            (r"(?:tell me about|describe|explain) (\w+)$", self._extract_about),
             # What do you know about X?
             (r"what do you know about (\w+)\??", self._extract_about),
             # Generic what/where/who/how
@@ -100,16 +100,16 @@ class Parser:
             (r"my (\w+) is (\w+)", self._extract_my_statement),
             # Remember: X is Y
             (r"remember:? (\w+) is (\w+)", self._extract_remember_fact),
-            # Note: X is/at Y
-            (r"note:? (\w+) (?:is|at) (\w+)", self._extract_note_fact),
-            # Important: X is Y
-            (r"important:? (\w+) (?:is|under|at) (\w+)", self._extract_note_location),
+            # Note: X is/at Y (support alphanumeric)
+            (r"note:? (\w+) (?:is|at) (\S+)", self._extract_note_fact),
+            # Important: X is Y (support alphanumeric and location)
+            (r"important:? (\w+) (?:is|under|at) (\S+)", self._extract_note_location),
             # X's Y is Z (most specific, must be first)
             (r"(\w+)'s (\w+) is (\w+)", self._extract_possessive),
             # The Y of X is Z
             (r"the (\w+) of (\w+) is (\w+)", self._extract_of_statement),
-            # The X is Y (e.g., "The sky is blue")
-            (r"the (\w+) is (\w+)", self._extract_the_is),
+            # The X is Y (e.g., "The sky is blue", "The password is secret123")
+            (r"the (\w+) is (\S+)", self._extract_the_is),
             # X works at/in/for Y
             (r"(\w+) works (?:at|in|for) (\w+)", self._extract_works_at),
             # X lives in Y
@@ -183,8 +183,8 @@ class Parser:
                 entities = extractor(match)
                 return ParseResult(Intent.CONTEXT, entities, 0.9, original)
 
-        # Check if it's a question
-        is_question = '?' in text or text.startswith(('what', 'where', 'who', 'how', 'why', 'when', 'is', 'does', 'do', 'can'))
+        # Check if it's a question or info request
+        is_question = '?' in text or text.startswith(('what', 'where', 'who', 'how', 'why', 'when', 'is', 'does', 'do', 'can', 'tell', 'describe', 'explain'))
 
         if is_question:
             # Try prediction patterns
